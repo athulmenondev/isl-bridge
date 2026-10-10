@@ -3,7 +3,7 @@ import MicButton from './components/MicButton';
 
 export default function App() {
   const [inputText, setInputText] = useState('');
-  const [language, setLanguage] = useState('en'); // Default to 'en'
+  const [language, setLanguage] = useState('en');
   const [sequence, setSequence] = useState([]);
   const [currentStepIdx, setCurrentStepIdx] = useState(-1);
   const [logs, setLogs] = useState([]);
@@ -54,19 +54,29 @@ export default function App() {
 
       setVideoSrc(url);
 
-      // Advance step if missing clip fails to emit events
-      const stepDuration = step.duration_ms || 1000;
-      const timer = setTimeout(() => {
+      // Long safety guard timer (15s) in case a stream stalls without triggering onEnded or onError
+      const guardTimer = setTimeout(() => {
+        addLog(`Step ${currentStepIdx + 1} timed out, skipping...`);
         setCurrentStepIdx((prev) => prev + 1);
-      }, stepDuration + 300);
+      }, 15000);
 
-      return () => clearTimeout(timer);
+      return () => clearTimeout(guardTimer);
     } else if (currentStepIdx >= sequence.length && sequence.length > 0) {
       addLog('Sequence playback completed.');
       setCurrentStepIdx(-1);
       setVideoSrc(null);
     }
   }, [currentStepIdx, sequence]);
+
+  const handleVideoEnded = () => {
+    // Advance naturally when the MP4 finishes playing completely
+    setCurrentStepIdx((prev) => prev + 1);
+  };
+
+  const handleVideoError = () => {
+    // Skip to next step immediately if the file is missing or corrupted
+    setCurrentStepIdx((prev) => prev + 1);
+  };
 
   return (
     <div style={{ padding: '20px' }}>
@@ -111,12 +121,14 @@ export default function App() {
           <div style={{ background: '#000', borderRadius: '8px', height: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             {videoSrc ? (
               <video
+                key={videoSrc}
                 ref={videoRef}
                 src={videoSrc}
                 autoPlay
                 muted
-                onEnded={() => setCurrentStepIdx((prev) => prev + 1)}
-                onError={() => setCurrentStepIdx((prev) => prev + 1)}
+                playsInline
+                onEnded={handleVideoEnded}
+                onError={handleVideoError}
                 style={{ maxHeight: '100%', maxWidth: '100%' }}
               />
             ) : (

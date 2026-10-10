@@ -9,8 +9,15 @@ export class AudioRecorder {
 
   async start(onLevelChange) {
     this.pcmBuffers = [];
-    this.stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    
+    // Enable browser audio filters to clean microphone input
+    this.stream = await navigator.mediaDevices.getUserMedia({
+      audio: {
+        echoCancellation: true,
+        noiseSuppression: true,
+        autoGainControl: true,
+      },
+    });
+
     const AudioContextClass = window.AudioContext || window.webkitAudioContext;
     this.audioCtx = new AudioContextClass();
 
@@ -20,7 +27,7 @@ export class AudioRecorder {
     this.processor.onaudioprocess = (e) => {
       if (!this.isRecording) return;
       const input = e.inputBuffer.getChannelData(0);
-      
+
       if (onLevelChange) {
         let sum = 0;
         for (let i = 0; i < input.length; i++) sum += input[i] * input[i];
@@ -40,16 +47,14 @@ export class AudioRecorder {
     this.isRecording = false;
     if (this.processor) this.processor.disconnect();
     if (this.stream) this.stream.getTracks().forEach((track) => track.stop());
-    
+
     const nativeSampleRate = this.audioCtx ? this.audioCtx.sampleRate : 44100;
     if (this.audioCtx) await this.audioCtx.close();
 
     let totalLength = 0;
     for (const buf of this.pcmBuffers) totalLength += buf.length;
-    
-    if (totalLength === 0) {
-      return null;
-    }
+
+    if (totalLength === 0) return null;
 
     const merged = new Float32Array(totalLength);
     let offset = 0;
@@ -58,7 +63,6 @@ export class AudioRecorder {
       offset += buf.length;
     }
 
-    // Resample to 16000 Hz if native AudioContext sample rate is different
     const resampled = this._resample(merged, nativeSampleRate, 16000);
     return this._encodeWAV(resampled, 16000);
   }

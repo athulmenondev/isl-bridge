@@ -14,8 +14,8 @@ SIGNFILES_DIR = STATIC_DIR / "signfiles"
 WORDS_FILE = BASE_DIR / "assets" / "words.txt"
 GLOSSARY_FILE = BASE_DIR / "assets" / "healthcare_glossary.json"
 
-# ASR Settings
-ASR_MODEL_SIZE = os.getenv("ISL_ASR_MODEL", "base")
+# ASR Settings — Upgrade default to 'small' model for improved English accuracy
+ASR_MODEL_SIZE = os.getenv("ISL_ASR_MODEL", "small")
 ASR_COMPUTE_TYPE = os.getenv("ISL_ASR_COMPUTE", "int8")
 ASR_CPU_THREADS = max(2, multiprocessing.cpu_count() - 1)
 
@@ -23,7 +23,7 @@ ASR_CPU_THREADS = max(2, multiprocessing.cpu_count() - 1)
 ASR_INITIAL_PROMPT = (
     "Healthcare and medical triage: fever, headache, pain, doctor, hospital, "
     "medicine, emergency, clinic, temperature, prescription, tablet, vomiting, "
-    "दीजिए, मुझे, बुखार, अस्पताल, दर्द, डॉक्टर, दवा"
+    "thank you, hello, water, food, please, goodbye, friend"
 )
 
 # Hallucination Filters
