@@ -1,0 +1,44 @@
+{
+  "version": "1.0",
+  "domain": "healthcare",
+  "comment": "Healthcare glossary mapping for ISL translation",
+  "concepts": {
+    "fever": {
+      "en": ["fever", "temperature"],
+      "hi": ["बुखार", "तापमान"],
+      "sigml": ["fever"],
+      "role": "OBJECT"
+    },
+    "headache": {
+      "en": ["headache", "head pain"],
+      "hi": ["सर दर्द", "सिरदर्द"],
+      "sigml": ["headache"],
+      "role": "OBJECT"
+    },
+    "hospital": {
+      "en": ["hospital", "clinic"],
+      "hi": ["अस्पताल", "दवाखाना"],
+      "sigml": ["clinic"],
+      "role": "LOCATION"
+    },
+    "medicine": {
+      "en": ["medicine", "tablet", "pill"],
+      "hi": ["दवा", "गोली"],
+      "sigml": ["medicine"],
+      "role": "OBJECT"
+    },
+    "doctor": {
+      "en": ["doctor", "physician"],
+      "hi": ["डॉक्टर", "चिकित्सक"],
+      "sigml": ["doctor"],
+      "role": "SUBJECT"
+    }
+  },
+  "hi_forms": {
+    "गोलियां": "गोली",
+    "बुखारा": "बुखार",
+    "दवादी": "दवा दी",
+    "अदोक्टरने": "डॉक्टर ने",
+    "अस्पतालमें": "अस्पताल में"
+  }
+}
